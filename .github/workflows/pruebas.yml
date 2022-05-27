@@ -15,6 +15,7 @@ env:
   
   
 jobs:
+
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -53,7 +54,17 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_SECRETS }}
         aws-region: ${{ secrets.AWS_REGION }}
     
-    
+    - id: upload
+      name: upload
+      run: |
+        aws ecr get-login-password \
+          --region ${{ secrets.AWS_REGION }} \
+          --profile ${{ env.AWS_PROFILE }} | \
+          docker login \
+          --username AWS \
+          --password-stdin ${{ secrets.AWS_ECR_AEN }}
+        docker tag ${{ env.DOCKER_IMAGE }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        docker push ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
     
 
         
