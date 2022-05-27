@@ -54,11 +54,16 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_SECRETS }}
         aws-region: ${{ secrets.AWS_REGION }}
         
-    - name:  Confirmar credenciales AWS
+    - name:  Ver credenciales AWS y ver comandos
       run: |
         cat $HOME/.aws/credentials
         cat $HOME/.aws/config
-        
+        echo " aws ecr get-login-password --region ${{ secrets.AWS_REGION }} --profile ${{ env.AWS_PROFILE }}"
+        echo " docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_AEN }}"
+        echo " docker tag ${{ env.DOCKER_IMAGE }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
+        echo " docker push ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
+    
+    
     
     - id: upload
       name: upload
