@@ -10,7 +10,7 @@ on:
 
 env:
   AWS_PROFILE: default
-  DOCKER_IMAGE: pruebas
+  DOCKER_IMAGE: leasencloud
   DOCKER_TAG: 1.0.0-SNAPSHOT
   
   
