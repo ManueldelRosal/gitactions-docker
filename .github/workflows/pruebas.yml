@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - packages/api-middleware/**
   pull_request:
     branches: [main]     
   workflow_dispatch:
