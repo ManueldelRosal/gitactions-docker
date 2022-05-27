@@ -1,8 +1,13 @@
-name: CI
-
+name: pruebas
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - packages/api-middleware/**
   pull_request:
-    branches: [master]
+    branches: [main]     
+  workflow_dispatch:
 
 env:
   AWS_PROFILE: mdelrosal
