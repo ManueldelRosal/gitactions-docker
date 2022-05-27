@@ -32,7 +32,7 @@ jobs:
 
     - name: Generate docker image
       run: | 
-        docker build . -t ${{ env.DOCKER_IMAGE }}
+        docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
   
     - name: Ver docker image
       run: | 
