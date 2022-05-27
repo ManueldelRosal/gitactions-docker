@@ -60,7 +60,7 @@ jobs:
         cat $HOME/.aws/config
         echo " aws ecr get-login-password --region ${{ secrets.AWS_REGION }} --profile ${{ env.AWS_PROFILE }}"
         echo " docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_AEN }}"
-        echo " docker tag ${{ env.DOCKER_IMAGE }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
+        echo " docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
         echo " docker push ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
     
     
@@ -74,6 +74,6 @@ jobs:
           docker login \
           --username AWS \
           --password-stdin ${{ secrets.AWS_ECR_AEN }}
-        docker tag ${{ env.DOCKER_IMAGE }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
         docker push ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
     
