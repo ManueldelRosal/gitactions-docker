@@ -53,6 +53,12 @@ jobs:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_SECRETS }}
         aws-region: ${{ secrets.AWS_REGION }}
+        
+    - name:  Confirmar credenciales AWS
+      run: |
+        cat $HOME/.aws/credentials
+        cat $HOME/.aws/config
+        
     
     - id: upload
       name: upload
