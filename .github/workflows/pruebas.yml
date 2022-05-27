@@ -7,6 +7,13 @@ on:
   #  branches: [main]     
   workflow_dispatch:
 
+
+env:
+  AWS_PROFILE: aen
+  DOCKER_IMAGE: pruebas
+  DOCKER_TAG: 1.0.0-SNAPSHOT
+  
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,7 +31,7 @@ jobs:
 
     - name: Generate docker image
       run: | 
-        docker build . -t ${{ env.DOCKER_IMAGE }}
+        docker build . -t pruebas
   
      - name: Ver docker image
       run: | 
