@@ -1,0 +1,198 @@
+name: CI/CD (api-middleware)
+on:
+  push:
+    branches:
+      #- master
+      - develop
+      #- release/**
+    paths:
+      - packages/api-middleware/**
+  workflow_dispatch:
+defaults:
+  run:
+    working-directory: ./packages/
+jobs:
+  ci-and-cd:
+    runs-on: ubuntu-latest
+    env:
+      HELM_EXPERIMENTAL_OCI: 1
+    steps:
+      - name: list directories 1
+        run: |
+          ls ${{ github.workspace }}
+###
+###      - uses: actions/checkout@v2
+###
+###      - name: list directories 2
+###        run: |
+###          ls ${{ github.workspace }}
+###
+###      - name: Set DEV env variables
+###        if: ${{ github.ref == 'refs/heads/develop' }}
+###        env:
+###          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_STG }}
+###          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}
+###          #KUBERNETES_CLUSTER: ${{ secrets.DEV_KUBERNETES_CLUSTER_VIDEO }}
+###          AWS_REGION: ${{ secrets.AWS_REGION }}
+###          #DOCKER_REGISTRY: ${{ secrets.DEV_DOCKER_REGISTRY }}
+###        run: |
+###          echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+###          echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+###          echo "KUBERNETES_CLUSTER=${KUBERNETES_CLUSTER}" >> $GITHUB_ENV
+###          echo "AWS_DEFAULT_REGION=${AWS_REGION}" >> $GITHUB_ENV
+###          echo "TAG_SUFFIX=-dev" >> $GITHUB_ENV
+###          echo "DOCKER_REGISTRY=${DOCKER_REGISTRY}" >> $GITHUB_ENV
+###          echo "DEPLOY_ENVIRONMENT=DEV" >> $GITHUB_ENV
+###
+###      #- name: Set STG env variables
+###      #  if: ${{ startsWith(github.ref,'refs/heads/release/') }}
+###      #  env:
+###      #    AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_AWS_ACCESS_KEY_ID }}
+###      #    AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_AWS_SECRET_ACCESS_KEY }}
+###      #    #KUBERNETES_CLUSTER: ...
+###      #    AWS_REGION: ${{ secrets.STAGING_AWS_REGION }}
+###      #    DOCKER_REGISTRY: ${{ secrets.STAGING_DOCKER_REGISTRY }}
+###      #  run: |
+###      #    echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+###      #    echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+###      #    echo "KUBERNETES_CLUSTER=${KUBERNETES_CLUSTER}" >> $GITHUB_ENV
+###      #    echo "AWS_DEFAULT_REGION=${AWS_REGION}" >> $GITHUB_ENV
+###      #    echo "TAG_SUFFIX=-stg" >> $GITHUB_ENV
+###      #    echo "DOCKER_REGISTRY=${DOCKER_REGISTRY}" >> $GITHUB_ENV
+###      #    echo "DEPLOY_ENVIRONMENT=STG" >> $GITHUB_ENV
+###      #
+###      #- name: Set PRO env variables
+###      #  if: ${{ github.ref == 'refs/heads/master' }}
+###      #  env:
+###      #    AWS_ACCESS_KEY_ID: ${{ secrets.PRODUCTION_AWS_ACCESS_KEY_ID }}
+###      #    AWS_SECRET_ACCESS_KEY: ${{ secrets.PRODUCTION_AWS_SECRET_ACCESS_KEY }}
+###      #    #KUBERNETES_CLUSTER: ...
+###      #    AWS_REGION: ${{ secrets.PRODUCTION_AWS_REGION }}
+###      #    DOCKER_REGISTRY: ${{ secrets.PRODUCTION_DOCKER_REGISTRY }}
+###      #  run: |
+###      #    echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+###      #    echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+###      #    echo "KUBERNETES_CLUSTER=${KUBERNETES_CLUSTER}" >> $GITHUB_ENV
+###      #    echo "AWS_DEFAULT_REGION=${AWS_REGION}" >> $GITHUB_ENV
+###      #    echo "TAG_SUFFIX=" >> $GITHUB_ENV
+###      #    echo "DOCKER_REGISTRY=${DOCKER_REGISTRY}" >> $GITHUB_ENV
+###      #    echo "DEPLOY_ENVIRONMENT=PRO" >> $GITHUB_ENV
+###
+###      - name: Read variables
+###        env:
+###            TAG_SUFFIX: ${{ env.TAG_SUFFIX }}
+###        run: |
+###          git fetch --all --tags
+###          PRODUCT_NAME=$(cat devops/PRODUCT_NAME)
+###          SERVICE_NAME=$(cat devops/SERVICE_NAME)
+###          SERVICE_FULL_NAME=${PRODUCT_NAME}-${SERVICE_NAME}
+###          VERSION=$(cat devops/VERSION)
+###          GIT_HASH=$(git rev-parse --short "$GITHUB_SHA")
+###          VERSION_TAG="$VERSION-$GIT_HASH"
+###          TAG="v${VERSION_TAG}${TAG_SUFFIX}"
+###          TAGGED=$(git tag --points-at HEAD | grep $TAG$ | wc -l)
+###          echo "SERVICE_FULL_NAME=$SERVICE_FULL_NAME" >> $GITHUB_ENV
+###          echo "VERSION_TAG=$VERSION_TAG" >> $GITHUB_ENV
+###          echo "DOCKER_IMAGE=$SERVICE_FULL_NAME:$VERSION_TAG" >> $GITHUB_ENV
+###          echo "TAG=$TAG" >> $GITHUB_ENV
+###          echo "TAGGED=$TAGGED" >> $GITHUB_ENV
+###
+###      - name: Cache node modules
+###        uses: actions/cache@v2
+###        if: env.TAGGED == '0'
+###        with:
+###          path: |
+###            node_modules
+###            packages/api-middleware/node_modules
+###          key: ${{ runner.os }}-yarn-lock-${{ hashFiles('yarn.lock') }}
+###
+###      - name: Build
+###        if: env.TAGGED == '0'
+###        run: yarn install --frozen-lockfile && yarn build:lerna
+###
+###      - name: Docker image
+###        if: env.TAGGED == '0'
+###        run: docker build . -t ${{ env.DOCKER_IMAGE }}
+###
+###      - name: Run vulnerability scan
+###        if: env.TAGGED == '0'
+###        uses: aquasecurity/trivy-action@master
+###        with:
+###          image-ref: ${{ env.DOCKER_IMAGE }}
+###          format: "table"
+###          exit-code: "0"
+###          ignore-unfixed: true
+###          vuln-type: "os,library"
+###          severity: "CRITICAL,HIGH"
+###
+###      - name: Push Docker Image to ECR
+###        id: ecr
+###        if: env.TAGGED == '0' && env.DEPLOY_ENVIRONMENT
+###        uses: jwalton/gh-ecr-push@v1
+###        with:
+###          access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+###          secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+###          region: eu-west-1
+###          image: ${{ env.DOCKER_IMAGE }}
+
+      # Package Helm only for CI
+#      - name: Package Helm
+#        if: env.TAGGED == '0' && env.DEPLOY_ENVIRONMENT
+#        run: bash ./devops/package.sh
+#
+#      - uses: aws-actions/configure-aws-credentials@v1
+#        if: env.DEPLOY_ENVIRONMENT
+#        with:
+#          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+#
+#      - name: Read AWS Account ID
+#        if: env.DEPLOY_ENVIRONMENT
+#        run: |
+#          AWS_ACCOUNT_ID="$(aws sts get-caller-identity --query Account --output text)"
+#          echo "AWS_ACCOUNT_ID=$AWS_ACCOUNT_ID" >> $GITHUB_ENV
+#
+#      - name: Helm Login to ECR Repository
+#        if: env.DEPLOY_ENVIRONMENT
+#        run: |
+#          aws ecr get-login-password \
+#          --region $AWS_DEFAULT_REGION | helm registry login \
+#          --username AWS \
+#          --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+#
+#      - name: Push Helm Chart to ECR
+#        if: env.TAGGED == '0' && env.DEPLOY_ENVIRONMENT
+#        run: |
+#          helm push ./devops/helm/$SERVICE_FULL_NAME-helm-$VERSION_TAG.tgz \
+#          oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/
+#
+#      - name: Tag commit
+#        if: env.TAGGED == '0' && env.DEPLOY_ENVIRONMENT
+#        run: |
+#          git tag "$TAG"
+#          git push origin "$TAG"
+#
+#      - uses: aws-actions/configure-aws-credentials@v1
+#        if: env.DEPLOY_ENVIRONMENT
+#        with:
+#          aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+#
+#      # Pull Helm Chart only for CD, if already tagged
+#      - name: Pull Helm Chart From ECR
+#        if: env.TAGGED != '0' && env.DEPLOY_ENVIRONMENT
+#        run: |
+#          (cd devops/helm && \
+#          helm pull oci://$AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$SERVICE_FULL_NAME-helm \
+#          --version $VERSION_TAG)
+#
+#      - name: Deployment
+#        if: env.DEPLOY_ENVIRONMENT
+#        id: deployment
+#        run: |
+#          export KUBECONFIG=$PWD/kubeconfig
+#          touch $KUBECONFIG
+#          aws eks update-kubeconfig --name $KUBERNETES_CLUSTER
+#          bash ./devops/deploy.sh
