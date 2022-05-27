@@ -8,7 +8,9 @@ on:
   workflow_dispatch:
 
 env:
-  AWS_PROFILE: mdelrosal
+  AWS_PROFILE: aen
+  DOCKER_IMAGE: pruebas
+  DOCKER_TAG: 1.0.0-SNAPSHOT
 
 jobs:
   build:
@@ -27,7 +29,7 @@ jobs:
 
     - name: Generate docker image
       run: | 
-        docker build . -t pruebas
+        docker build . -t ${{ env.DOCKER_IMAGE }}
   
      - name: Ver docker image
       run: | 
@@ -63,4 +65,6 @@ jobs:
         docker tag ${{ env.DOCKER_IMAGE }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
         docker push ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
         
-        
+
+
+
