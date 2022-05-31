@@ -53,7 +53,7 @@ jobs:
       run: |
         echo "Configure AWS credentials Develop"
         echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
         echo "AWS_REGION=${AWS_REGION}" >> $GITHUB_ENV
         echo "AWS_ECR=${AWS_ECR}" >> $GITHUB_ENV
         
@@ -67,7 +67,7 @@ jobs:
       run: |
         echo "Configure AWS credentials Develop"
         echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
         echo "AWS_REGION=${AWS_REGION}" >> $GITHUB_ENV
         echo "AWS_ECR=${AWS_ECR}" >> $GITHUB_ENV
 
