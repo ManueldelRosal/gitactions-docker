@@ -1,4 +1,4 @@
-name: deploy
+name: deploy-automatizacion
 on:
   #push:
   #  branches:
