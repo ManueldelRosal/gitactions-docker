@@ -15,8 +15,8 @@ env:
   AWS_PROFILE: default
   DOCKER_IMAGE: leasencloud
   DOCKER_TAG: 1.0.0-SNAPSHOT
-  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
-  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+  AWS_ACCESS_KEY_ID: default
+  AWS_SECRET_ACCESS_KEY: default
   AWS_ECR: default
   AWS_REGION: eu-west-1
   
@@ -90,14 +90,14 @@ jobs:
       run: | 
         apt-get update && apt-get -y install awscli
         aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ env.AWS_ACCESS_KEY_SECRETS }} 
+        aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} 
         aws configure set default.region ${{ env.AWS_REGION }}
         
     #- name: Configure AWS credentials Develop
     #  uses: aws-actions/configure-aws-credentials@v1
     #  with:
     #    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #    aws-secret-access-key: ${{ secrets.AWS_ACCESS_KEY_SECRETS }}
+    #    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     #    aws-region: ${{ secrets.AWS_REGION }}
         
     - name:  Ver credenciales AWS y ver comandos
