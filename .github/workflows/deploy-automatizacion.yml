@@ -75,7 +75,7 @@ jobs:
       if: ${{ github.ref == 'refs/heads/staging' }}
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_STG }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV_STG }}
         AWS_REGION: ${{ secrets.AWS_REGION }}
         AWS_ECR: ${{ secrets.AWS_ECR_STG }}
       run: |
