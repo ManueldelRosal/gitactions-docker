@@ -32,15 +32,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    #- name: Set Path
-    #  run: |
-    #    ls -l
-    #- name: Generate docker image
-    #  run: | 
-    #    docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}  
-    #- name: Ver docker image
-    #  run: | 
-    #    docker images 
+    - name: Set Path
+      run: |
+        ls -l
+    - name: Generate docker image
+      run: | 
+        docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}  
+    - name: Ver docker image
+      run: | 
+        docker images 
         
  
     - name: Configure AWS credentials main
@@ -93,12 +93,12 @@ jobs:
         aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} 
         aws configure set default.region ${{ env.AWS_REGION }}
         
-    #- name: Configure AWS credentials Develop
-    #  uses: aws-actions/configure-aws-credentials@v1
-    #  with:
-    #    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #    aws-region: ${{ secrets.AWS_REGION }}
+    - name: Configure AWS credentials Develop
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
         
     - name:  Ver credenciales AWS y ver comandos
       run: |
