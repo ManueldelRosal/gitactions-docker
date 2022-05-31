@@ -93,12 +93,12 @@ jobs:
         aws configure set aws_secret_access_key ${{ env.AWS_SECRET_ACCESS_KEY }} 
         aws configure set default.region ${{ env.AWS_REGION }}
         
-    - name: Configure AWS credentials Develop
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ secrets.AWS_REGION }}
+    #- name: Configure AWS credentials Develop
+    #  uses: aws-actions/configure-aws-credentials@v1
+    #  with:
+    #    aws-access-key-id: ${{ env.AWS_ACCESS_KEY_ID }}
+    #    aws-secret-access-key: ${{ env.AWS_SECRET_ACCESS_KEY }}
+    #    aws-region: ${{ env.AWS_REGION }}
         
     - name:  Ver credenciales AWS y ver comandos
       run: |
@@ -111,14 +111,14 @@ jobs:
     
     
     
-    #- id: upload
-    #  name: upload
-    #  run: |
-    #    aws ecr get-login-password \
-    #      --region ${{ env.AWS_REGION }} \
-    #      --profile ${{ env.AWS_PROFILE }} | \
-    #      docker login \
-    #      --username AWS \
-    #      --password-stdin ${{ env.AWS_ECR }}
-    #    docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
-    #    docker push ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+    - id: upload
+      name: upload
+      run: |
+        aws ecr get-login-password \
+          --region ${{ env.AWS_REGION }} \
+          --profile ${{ env.AWS_PROFILE }} | \
+          docker login \
+          --username AWS \
+          --password-stdin ${{ env.AWS_ECR }}
+        docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        docker push ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
