@@ -1,10 +1,13 @@
 name: deploy-automatizacion
 on:
-  #push:
-  #  branches:
-  #    - main
-  #pull_request:
-  #  branches: [main]     
+  push:
+    branches:
+      - develop
+      - staging
+  pull_request:
+    branches:
+      - develop
+      - staging
   workflow_dispatch:
 
 
@@ -12,6 +15,10 @@ env:
   AWS_PROFILE: default
   DOCKER_IMAGE: leasencloud
   DOCKER_TAG: 1.0.0-SNAPSHOT
+  AWS_ACCESS_KEY_ID: default
+  AWS_ACCESS_KEY_SECRETS: default
+  AWS_ECR: default
+  AWS_REGION: eu-west-1
   
   
 jobs:
@@ -30,20 +37,37 @@ jobs:
         ls -l
     - name: Generate docker image
       run: | 
-        docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
-  
+        docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}  
     - name: Ver docker image
       run: | 
         docker images 
+        
+        
+    - name: Configure AWS credentials Develop
+      if: ${{ github.ref == 'refs/heads/develop' }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ECR: ${{ secrets.AWS_ECR_DEV }}
+
+    - name: Configure AWS credentials Staging
+      if: ${{ github.ref == 'refs/heads/staging' }}
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID_STG }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ECR: ${{ secrets.AWS_ECR_STG }}
+        
         
         
         
     - name: install-awscli
       run: | 
         apt-get update && apt-get -y install awscli
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_ACCESS_KEY_SECRETS }} 
-        aws configure set default.region ${{ secrets.AWS_REGION }}
+        aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ env.AWS_ACCESS_KEY_SECRETS }} 
+        aws configure set default.region ${{ env.AWS_REGION }}
         
     #- name: Configure AWS credentials Develop
     #  uses: aws-actions/configure-aws-credentials@v1
@@ -56,10 +80,10 @@ jobs:
       run: |
         cat $HOME/.aws/credentials
         cat $HOME/.aws/config
-        echo " aws ecr get-login-password --region ${{ secrets.AWS_REGION }} --profile ${{ env.AWS_PROFILE }}"
-        echo " docker login --username AWS --password-stdin ${{ secrets.AWS_ECR_AEN }}"
-        echo " docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
-        echo " docker push ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
+        echo " aws ecr get-login-password --region ${{ env.AWS_REGION }} --profile ${{ env.AWS_PROFILE }}"
+        echo " docker login --username AWS --password-stdin ${{ env.AWS_ECR }}"
+        echo " docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
+        echo " docker push ${{ env.AWS_ECR}}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
     
     
     
@@ -67,10 +91,10 @@ jobs:
       name: upload
       run: |
         aws ecr get-login-password \
-          --region ${{ secrets.AWS_REGION }} \
+          --region ${{ env.AWS_REGION }} \
           --profile ${{ env.AWS_PROFILE }} | \
           docker login \
           --username AWS \
-          --password-stdin ${{ secrets.AWS_ECR_AEN }}
-        docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
-        docker push ${{ secrets.AWS_ECR_AEN }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+          --password-stdin ${{ env.AWS_ECR }}
+        docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        docker push ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
