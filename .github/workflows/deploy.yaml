@@ -1,4 +1,4 @@
-name: pruebas
+name: pruebas-deploy
 on:
   #push:
   #  branches:
