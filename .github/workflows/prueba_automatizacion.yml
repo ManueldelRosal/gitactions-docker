@@ -1,0 +1,87 @@
+name: CI/CD (api-middleware)
+on:
+  push:
+    branches:
+      - develop
+      - staging
+  workflow_dispatch:
+
+env:
+  AWS_PROFILE: default
+  DOCKER_IMAGE: api-middleware
+  DOCKER_TAG: 1.0.0-SNAPSHOT
+
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set Path
+      run: |
+        ls -l
+    - name: Generate docker image
+      run: |
+        docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+    - name: Ver docker image
+      run: |
+        docker images
+    - name: install-awscli
+      run: |
+        apt-get update && apt-get -y install awscli
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+        aws configure set default.region ${{ secrets.AWS_REGION }}
+    - name: Configure AWS credentials Develop
+      if: ${{ github.ref == 'refs/heads/develop' }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Configure AWS credentials Staging
+      if: ${{ github.ref == 'refs/heads/staging' }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_STG }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_STG }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+
+    - name: Read DEV variables
+      if: ${{ github.ref == 'refs/heads/develop' }}
+      env:
+        AWS_ECR: ${{ secrets.AWS_ECR_DEV }} 
+      run: |
+        echo "AWS_ECR=$AWS_ECR >> GITHUB_ENV" 
+    - name: Read STG variables
+      if: ${{ github.ref == 'refs/heads/staging' }}
+      env:
+        AWS_ECR: ${{ secrets.AWS_ECR_STG }} 
+      run: |
+        echo "AWS_ECR=$AWS_ECR >> GITHUB_ENV" 
+    - name:  Ver credenciales AWS y ver comandos
+      run: |
+        cat $HOME/.aws/credentials
+        cat $HOME/.aws/config
+        echo " aws ecr get-login-password --region ${{ secrets.AWS_REGION }} --profile ${{ env.AWS_PROFILE }}"
+        echo " docker login --username AWS --password-stdin ${AWS_ECR}"
+        echo " docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${AWS_ECR}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
+        echo " docker push ${AWS_ECR}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}"
+    - id: upload
+      name: upload
+      run: |
+        aws ecr get-login-password \
+          --region ${{ secrets.AWS_REGION }} \
+          --profile ${{ env.AWS_PROFILE }} | \
+          docker login \
+          --username AWS \
+          --password-stdin ${AWS_ECR}
+        docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${AWS_ECR}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+        docker push ${AWS_ECR}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
