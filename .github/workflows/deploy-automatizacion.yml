@@ -52,6 +52,10 @@ jobs:
         AWS_ECR: ${{ secrets.AWS_ECR_DEV }}
       run: |
         echo "Configure AWS credentials Develop"
+        echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
+        echo "AWS_REGION=${AWS_REGION}" >> $GITHUB_ENV
+        echo "AWS_ECR=${AWS_ECR}" >> $GITHUB_ENV
 
     - name: Configure AWS credentials Staging
       if: ${{ github.ref == 'refs/heads/staging' }}
@@ -62,7 +66,10 @@ jobs:
         AWS_ECR: ${{ secrets.AWS_ECR_STG }}
       run: |
         echo "Configure AWS credentials Staging"    
-        
+        echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
+        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
+        echo "AWS_REGION=${AWS_REGION}" >> $GITHUB_ENV
+        echo "AWS_ECR=${AWS_ECR}" >> $GITHUB_ENV       
         
         
     - name: install-awscli
