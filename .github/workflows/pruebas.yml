@@ -34,7 +34,7 @@ jobs:
       run: | 
         docker build . -t ${{ env.DOCKER_IMAGE }}
   
-     - name: Ver docker image
+    - name: Ver docker image
       run: | 
         docker images 
         
