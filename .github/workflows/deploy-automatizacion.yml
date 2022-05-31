@@ -32,15 +32,15 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Set Path
-      run: |
-        ls -l
-    - name: Generate docker image
-      run: | 
-        docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}  
-    - name: Ver docker image
-      run: | 
-        docker images 
+    #- name: Set Path
+    #  run: |
+    #    ls -l
+    #- name: Generate docker image
+    #  run: | 
+    #    docker build . -t ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}  
+    #- name: Ver docker image
+    #  run: | 
+    #    docker images 
         
         
     - name: Configure AWS credentials Develop
@@ -67,9 +67,9 @@ jobs:
       run: |
         echo "Configure AWS credentials Staging"    
         echo "AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID" >> $GITHUB_ENV
-        echo "AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}" >> $GITHUB_ENV
-        echo "AWS_REGION=${AWS_REGION}" >> $GITHUB_ENV
-        echo "AWS_ECR=${AWS_ECR}" >> $GITHUB_ENV       
+        echo "AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY" >> $GITHUB_ENV
+        echo "AWS_REGION=$AWS_REGION" >> $GITHUB_ENV
+        echo "AWS_ECR=$AWS_ECR" >> $GITHUB_ENV       
         
         
     - name: install-awscli
@@ -97,14 +97,14 @@ jobs:
     
     
     
-    - id: upload
-      name: upload
-      run: |
-        aws ecr get-login-password \
-          --region ${{ env.AWS_REGION }} \
-          --profile ${{ env.AWS_PROFILE }} | \
-          docker login \
-          --username AWS \
-          --password-stdin ${{ env.AWS_ECR }}
-        docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
-        docker push ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+    #- id: upload
+    #  name: upload
+    #  run: |
+    #    aws ecr get-login-password \
+    #      --region ${{ env.AWS_REGION }} \
+    #      --profile ${{ env.AWS_PROFILE }} | \
+    #      docker login \
+    #      --username AWS \
+    #      --password-stdin ${{ env.AWS_ECR }}
+    #    docker tag ${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }} ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
+    #    docker push ${{ env.AWS_ECR }}/${{ env.DOCKER_IMAGE }}:${{ env.DOCKER_TAG }}
