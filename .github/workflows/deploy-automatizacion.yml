@@ -16,7 +16,7 @@ env:
   DOCKER_IMAGE: leasencloud
   DOCKER_TAG: 1.0.0-SNAPSHOT
   AWS_ACCESS_KEY_ID: default
-  AWS_SECRET_ACCESS_KEY: default
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
   AWS_ECR: default
   AWS_REGION: eu-west-1
   
